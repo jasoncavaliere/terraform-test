@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Vault"
+            }
+        },
+        "rsvtags": {
+            "type": "string",
+            "defaultValue": "{\"APP\":\"XXX\",\"BUD\":\"XXX\",\"CTC\":\"XXX@XXX\",\"ENV\":\"XXX\"}",
+            "metadata": {
+                "description": "Tags of the Vault"
+            }
+        },
+        "skuTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard"
+            ],
+            "metadata": {
+                "description": "SKU tier for the vault"
+            }
+        }
+    },
+    "variables": {
+        "rsvtagsbase64": "[base64(parameters('rsvtags'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.RecoveryServices/vaults",
+            "apiVersion": "2016-06-01",
+            "name": "[parameters('vaultName')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[base64ToJson(variables('rsvtagsbase64'))]",
+            "sku": {
+                "name": "RS0",
+                "tier": "[parameters('skuTier')]"
+            },
+            "properties": {
+            }
+        }
+    ],
+    "outputs": {
+        "vaultName": {
+            "type": "string",
+            "value": "[parameters('vaultName')]"
+        },
+        "rsvtagsjson": {
+            "type": "object",
+            "value": "[base64ToJson(variables('rsvtagsbase64'))]"
+        },
+        "resourceID": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.RecoveryServices/vaults', parameters('vaultName'))]"
+          }
+    }
+}
