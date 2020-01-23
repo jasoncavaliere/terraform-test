@@ -39,7 +39,6 @@ steps:
     command: 'apply'
     workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
     environmentServiceName: 'JasonC(f0056c30-fd14-42b4-b54c-4a7b999fe014)'
-    secureVarsFile: 'secrets.tfvars'
     commandOptions: '-auto-approve artifact'
 
 
