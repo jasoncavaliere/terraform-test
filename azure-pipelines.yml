@@ -6,21 +6,39 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'ubuntu-latest'
-
-
 - task: TerraformInstaller@0
   inputs:
     terraformVersion: '0.12.19'
 
-
-- task: PowerShell@2
+- task: TerraformCLI@0
   inputs:
-    targetType: 'inline'
-    script: |
-      # Write your PowerShell commands here.
-      
-      terraform init
-      terraform plan -out artifact -var-file ./secrets.tfvars
-    workingDirectory: 'infrastructure'
+    command: 'init'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+    backendType: 'azurerm'
+    backendServiceArm: 'JasonC(f0056c30-fd14-42b4-b54c-4a7b999fe014)'
+    backendAzureRmResourceGroupName: 'rg-inf-terraform'
+    backendAzureRmStorageAccountName: 'terraformstate32'
+    backendAzureRmContainerName: 'terraform'
+    backendAzureRmKey: 'terraform-getting-started.tfstate'
+
+
+
+- task: TerraformCLI@0
+  inputs:
+    command: 'plan'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+    environmentServiceName: 'JasonC(f0056c30-fd14-42b4-b54c-4a7b999fe014)'
+    secureVarsFile: 'secrets.tfvars'
+    commandOptions: '-out artifact'
+
+- task: TerraformCLI@0
+  inputs:
+    command: 'apply'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+    environmentServiceName: 'JasonC(f0056c30-fd14-42b4-b54c-4a7b999fe014)'
+    secureVarsFile: 'secrets.tfvars'
+    commandOptions: '-auto-approve artifact'
+
+
+
+
