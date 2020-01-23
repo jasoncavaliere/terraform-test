@@ -14,3 +14,4 @@ create_sa/
 **/secret/*.json
 **/secret/*.tfvars
 infrastructure/secrets/
+infrastructure/artifact
