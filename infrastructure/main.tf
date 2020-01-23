@@ -130,8 +130,10 @@ resource "null_resource" "ml-workspace-dependencies" {
 resource "null_resource" "create-ml-workspace" {
 	depends_on=[null_resource.ml-workspace-dependencies]
 	provisioner "local-exec" {
-		interpreter =["PowerShell"]
-		command ="az ml workspace create -w ${local.insightsMachineLearningWorkspaceName} -f \"${local.insightsMachineLearningWorkspaceFriendlyName}\" -g \"${azurerm_resource_group.insightsgroup.name}\" --storage-account \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Storage/storageAccounts/${local.insightsStorageAccountName}\"  --keyvault \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.KeyVault/vaults/${local.insightsKeyVaultName}\"  --application-insights \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Insights/components/${local.insightsApplicationInsightsName}\"  -l \"${local.regionName}\"  --sku \"${local.insightsMachineLearningWorkspaceSku}\""
+	#	interpreter =["bash"]
+		command = <<EOT
+		az ml workspace create -w ${local.insightsMachineLearningWorkspaceName} -f "${local.insightsMachineLearningWorkspaceFriendlyName}" -g "${azurerm_resource_group.insightsgroup.name}" --storage-account "/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Storage/storageAccounts/${local.insightsStorageAccountName}"  --keyvault "/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.KeyVault/vaults/${local.insightsKeyVaultName}"  --application-insights "/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Insights/components/${local.insightsApplicationInsightsName}"  -l "${local.regionName}"  --sku "${local.insightsMachineLearningWorkspaceSku}"
+		EOT
   }
 }
 
