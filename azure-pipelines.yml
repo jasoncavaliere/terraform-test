@@ -10,6 +10,11 @@ trigger:
   inputs:
     terraformVersion: '0.12.19'
 
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+steps:
 - task: TerraformCLI@0
   inputs:
     command: 'init'
@@ -20,8 +25,6 @@ trigger:
     backendAzureRmStorageAccountName: 'terraformstate32'
     backendAzureRmContainerName: 'terraform'
     backendAzureRmKey: 'terraform-getting-started.tfstate'
-
-
 
 - task: TerraformCLI@0
   inputs:
