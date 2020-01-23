@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "*.tf": "terraform",
-        "*.tfvars": "terraform",
-        "*.tfstate": "json"
-    },
-    "editor.formatOnSave": true,
-    "files.eol": "\n"
-}
