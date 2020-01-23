@@ -12,6 +12,20 @@ pool:
 
 steps:
 
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: 'curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash'
+
+
+
+- script: az --version
+  displayName: 'Show Azure CLI version'
+
+- script: az extension add -n azure-devops
+  displayName: 'Install Azure DevOps Extension'
+
+
 - task: TerraformInstaller@0
   inputs:
     terraformVersion: '0.12.19'
