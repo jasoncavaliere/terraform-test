@@ -13,3 +13,4 @@ create_sa/
 **/test.tf
 **/secret/*.json
 **/secret/*.tfvars
+infrastructure/secrets/
