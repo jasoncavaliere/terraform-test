@@ -15,18 +15,29 @@ terraform {
 }
 
 variable "subscription_Id" {
-  type        = string
+  type			= string
   description = "The Azure subscriptionId for resources."
 }
 variable "tenant_Id" {
+  type        	= string
+  description 	= "The Azure tenant ID for resources."
+}
+variable "script_principal_Id" {
+  type        	= string
+  description = "The Azure clientID (AD App registration) used for manual terraform provisioning."
+}
+variable "script_principal_secret" {
   type        = string
-  description = "The Azure tenant ID for resources."
+  description = "The Azure client sercret (AD App registration) used for manual terraform provisioning."
 }
 
 # Configure the Azure provider
 provider "azurerm" {
-    version = "=1.41.0"
+    version 		= "=1.41.0"
 	subscription_id = var.subscription_Id
+	client_id 		= var.script_principal_Id
+	client_secret 	= var.script_principal_secret
+	tenant_id		= var.tenant_Id
 }
 
 locals{
@@ -123,6 +134,7 @@ resource "null_resource" "ml-workspace-dependencies" {
 
 
 
+#command="az login --service-principal -u ${var.script_principal_Id} -p ${var.script_principal_secret} --tenant ${var.tenant_Id}";
 #-w workspace-Name
 #-f --friendly-name 
 #-g --resource-group
@@ -130,10 +142,19 @@ resource "null_resource" "ml-workspace-dependencies" {
 resource "null_resource" "create-ml-workspace" {
 	depends_on=[null_resource.ml-workspace-dependencies]
 	provisioner "local-exec" {
-	#	interpreter =["bash"]
-		command = <<EOT
-		az ml workspace create -w ${local.insightsMachineLearningWorkspaceName} -f "${local.insightsMachineLearningWorkspaceFriendlyName}" -g "${azurerm_resource_group.insightsgroup.name}" --storage-account "/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Storage/storageAccounts/${local.insightsStorageAccountName}"  --keyvault "/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.KeyVault/vaults/${local.insightsKeyVaultName}"  --application-insights "/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Insights/components/${local.insightsApplicationInsightsName}"  -l "${local.regionName}"  --sku "${local.insightsMachineLearningWorkspaceSku}"
-		EOT
+  		interpreter = ["PowerShell", "-Command"]
+		command = " ./createMLWorkspace.PS1 -workspaceName '${local.insightsMachineLearningWorkspaceName}' -friendlyName '${local.insightsMachineLearningWorkspaceFriendlyName}' -rgName '${azurerm_resource_group.insightsgroup.name}' -storageAccountName '${local.insightsStorageAccountName}' -subscriptionId '${var.subscription_Id}' -kvsName '${local.insightsKeyVaultName}' -insightsName '${local.insightsApplicationInsightsName}' -regionName '${local.regionName}' -sku '${local.insightsMachineLearningWorkspaceSku}' "
+		# command = <<EOT 
+		# az extension add -n azure-cli-ml; 
+		# az ml workspace create -w "${local.insightsMachineLearningWorkspaceName}"
+		# -f "${local.insightsMachineLearningWorkspaceFriendlyName}" 
+		# -g "${azurerm_resource_group.insightsgroup.name}" 
+		# --storage-account \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Storage/storageAccounts/${local.insightsStorageAccountName}"  
+		# --keyvault \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.KeyVault/vaults/${local.insightsKeyVaultName}"  
+		# --application-insights \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Insights/components/${local.insightsApplicationInsightsName}"  
+		# -l "${local.regionName}\"  
+		# --sku "${local.insightsMachineLearningWorkspaceSku}\"
+		# EOT
   }
 }
 
@@ -144,45 +165,3 @@ resource "null_resource" "attach-ml-folder" {
 		command ="az ml folder attach --workspace-name ${local.insightsMachineLearningWorkspaceName} --resource-group ${local.insightsResourceGroupName}"
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
