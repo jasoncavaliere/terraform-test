@@ -154,10 +154,3 @@ resource "null_resource" "create-ml-workspace" {
   }
 }
 
-
-resource "null_resource" "attach-ml-folder" {
-	depends_on=[null_resource.create-ml-workspace]
-	provisioner "local-exec" {
-		command ="az ml folder attach --workspace-name ${local.insightsMachineLearningWorkspaceName} --resource-group ${local.insightsResourceGroupName}"
-  }
-}

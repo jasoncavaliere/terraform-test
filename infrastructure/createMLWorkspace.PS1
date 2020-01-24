@@ -23,6 +23,8 @@ $kvs = "/subscriptions/$subscriptionId/resourceGroups/$rgName/providers/Microsof
 az extension add -n azure-cli-ml        
 az ml workspace create -w $workspaceName -f $friendlyName -g $rgName --storage-account "$storageAccount" --keyvault "$kvs" --application-insights "$insights" -l "$regionName" --sku $sku
 
+az ml folder attach --workspace-name $workspaceName --resource-group $rgName
+
 
         
 
