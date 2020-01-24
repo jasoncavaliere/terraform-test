@@ -134,14 +134,6 @@ resource "null_resource" "ml-workspace-dependencies" {
 
 
 
-resource "null_resource" "ps-test" {
-	depends_on=[null_resource.ml-workspace-dependencies]
-	provisioner "local-exec" {
-  		interpreter = ["PowerShell", "-Command"]
-		command = " write-host THIS IS WORKING IN TERRAFORM "		
-  }
-}
-
 
 
 #command="az login --service-principal -u ${var.script_principal_Id} -p ${var.script_principal_secret} --tenant ${var.tenant_Id}";
@@ -149,11 +141,16 @@ resource "null_resource" "ps-test" {
 #-f --friendly-name 
 #-g --resource-group
 #-l --location
+
+
+
 resource "null_resource" "create-ml-workspace" {
-	depends_on=[null_resource.ml-workspace-dependencies]
+	depends_on=[null_resource.ml-workspace-dependencies,azurerm_storage_account.insights-storage,azurerm_application_insights.insights-insights,azurerm_key_vault.insignts-kvs]
 	provisioner "local-exec" {
-  		interpreter = ["PowerShell", "-Command"]
-		command = " ./createMLWorkspace.PS1 -workspaceName '${local.insightsMachineLearningWorkspaceName}' -friendlyName '${local.insightsMachineLearningWorkspaceFriendlyName}' -rgName '${azurerm_resource_group.insightsgroup.name}' -storageAccountName '${local.insightsStorageAccountName}' -subscriptionId '${var.subscription_Id}' -kvsName '${local.insightsKeyVaultName}' -insightsName '${local.insightsApplicationInsightsName}' -regionName '${local.regionName}' -sku '${local.insightsMachineLearningWorkspaceSku}' "
+		#SPECIFICALY used 'pwsh' and not 'powershell' - if you're getting errors running this locally, you dod not have powershell.core installed
+		#https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows?view=powershell-7
+  		interpreter = ["pwsh", "-Command"]
+		command = " ./createMLWorkspace.PS1 -workspaceName '${local.insightsMachineLearningWorkspaceName}' -friendlyName '${local.insightsMachineLearningWorkspaceFriendlyName}' -rgName '${azurerm_resource_group.insightsgroup.name}' -storageAccountName '${azurerm_storage_account.insights-storage.name}' -subscriptionId '${var.subscription_Id}' -kvsName '${local.insightsKeyVaultName}' -insightsName '${local.insightsApplicationInsightsName}' -regionName '${local.regionName}' -sku '${local.insightsMachineLearningWorkspaceSku}' "
   }
 }
 
