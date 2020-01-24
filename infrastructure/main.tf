@@ -134,6 +134,16 @@ resource "null_resource" "ml-workspace-dependencies" {
 
 
 
+resource "null_resource" "ps-test" {
+	depends_on=[null_resource.ml-workspace-dependencies]
+	provisioner "local-exec" {
+  		interpreter = ["PowerShell", "-Command"]
+		command = " write-host THIS IS WORKING IN TERRAFORM "		
+  }
+}
+
+
+
 #command="az login --service-principal -u ${var.script_principal_Id} -p ${var.script_principal_secret} --tenant ${var.tenant_Id}";
 #-w workspace-Name
 #-f --friendly-name 
@@ -144,17 +154,6 @@ resource "null_resource" "create-ml-workspace" {
 	provisioner "local-exec" {
   		interpreter = ["PowerShell", "-Command"]
 		command = " ./createMLWorkspace.PS1 -workspaceName '${local.insightsMachineLearningWorkspaceName}' -friendlyName '${local.insightsMachineLearningWorkspaceFriendlyName}' -rgName '${azurerm_resource_group.insightsgroup.name}' -storageAccountName '${local.insightsStorageAccountName}' -subscriptionId '${var.subscription_Id}' -kvsName '${local.insightsKeyVaultName}' -insightsName '${local.insightsApplicationInsightsName}' -regionName '${local.regionName}' -sku '${local.insightsMachineLearningWorkspaceSku}' "
-		# command = <<EOT 
-		# az extension add -n azure-cli-ml; 
-		# az ml workspace create -w "${local.insightsMachineLearningWorkspaceName}"
-		# -f "${local.insightsMachineLearningWorkspaceFriendlyName}" 
-		# -g "${azurerm_resource_group.insightsgroup.name}" 
-		# --storage-account \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Storage/storageAccounts/${local.insightsStorageAccountName}"  
-		# --keyvault \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.KeyVault/vaults/${local.insightsKeyVaultName}"  
-		# --application-insights \"/subscriptions/${var.subscription_Id}/resourceGroups/${azurerm_resource_group.insightsgroup.name}/providers/Microsoft.Insights/components/${local.insightsApplicationInsightsName}"  
-		# -l "${local.regionName}\"  
-		# --sku "${local.insightsMachineLearningWorkspaceSku}\"
-		# EOT
   }
 }
 
