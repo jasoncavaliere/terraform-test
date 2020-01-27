@@ -126,29 +126,14 @@ resource "azurerm_application_insights" "insights-insights" {
 	application_type    	= local.insightsApplicationType 
 }
 
-resource "null_resource" "ml-workspace-dependencies" {
-	provisioner "local-exec" {
-		command = "az extension add -n azure-cli-ml"  
-	}
-}
-
-
-
-
-
-#command="az login --service-principal -u ${var.script_principal_Id} -p ${var.script_principal_secret} --tenant ${var.tenant_Id}";
-#-w workspace-Name
-#-f --friendly-name 
-#-g --resource-group
-#-l --location
-
-
-
 resource "null_resource" "create-ml-workspace" {
-	depends_on=[null_resource.ml-workspace-dependencies,azurerm_storage_account.insights-storage,azurerm_application_insights.insights-insights,azurerm_key_vault.insignts-kvs]
+	depends_on=[azurerm_storage_account.insights-storage,azurerm_application_insights.insights-insights,azurerm_key_vault.insignts-kvs]
 	provisioner "local-exec" {
 		#SPECIFICALY used 'pwsh' and not 'powershell' - if you're getting errors running this locally, you dod not have powershell.core installed
 		#https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows?view=powershell-7
+		
+		#Also worth noting that the command is inline becuase I was having serious issues w/ using an EOT command, the reccomended way of doing this.  
+		#IF we can figure out how to address this, we can probably ditch the PS1 file and have it all inline, the script is only 3 lines long...
   		interpreter = ["pwsh", "-Command"]
 		command = " ./createMLWorkspace.PS1 -workspaceName '${local.insightsMachineLearningWorkspaceName}' -friendlyName '${local.insightsMachineLearningWorkspaceFriendlyName}' -rgName '${azurerm_resource_group.insightsgroup.name}' -storageAccountName '${azurerm_storage_account.insights-storage.name}' -subscriptionId '${var.subscription_Id}' -kvsName '${local.insightsKeyVaultName}' -insightsName '${local.insightsApplicationInsightsName}' -regionName '${local.regionName}' -sku '${local.insightsMachineLearningWorkspaceSku}' "
   }
