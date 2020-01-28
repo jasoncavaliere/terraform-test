@@ -349,3 +349,7 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 deploy/azure/terraform/secrets/
+infrastructure/errored.tfstate
+infrastructure/.terraform/terraform.tfstate
+infrastructure/secrets/secrets.tfvars
+infrastructure/.terraform/plugins/windows_amd64/lock.json
