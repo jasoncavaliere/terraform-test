@@ -353,3 +353,5 @@ infrastructure/errored.tfstate
 infrastructure/.terraform/terraform.tfstate
 infrastructure/secrets/secrets.tfvars
 infrastructure/.terraform/plugins/windows_amd64/lock.json
+infrastructure/.terraform/plugins/windows_amd64/terraform-provider-azurerm_v1.41.0_x4.exe
+infrastructure/.terraform/plugins/windows_amd64/terraform-provider-null_v2.1.2_x4.exe
